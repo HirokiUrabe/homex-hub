@@ -106,7 +106,6 @@ class SensorTag(object):
         self.requester.write_by_handle(0x47, status)
 
     def check_Optical(self):
-        time.sleep(3)
         raw_data = self.requester.read_by_handle(0x44)[0]
         raw_lux = (ord(raw_data[1]) << 8) + ord(raw_data[0])
         raw_lux_m = raw_lux & 0b0000111111111111
@@ -125,12 +124,33 @@ if __name__ == '__main__':
         sys.exit(1)
 
     tag = SensorTag(sys.argv[1])
+
     tag.connect()
 
-    tag.enable_Optical(True)
-    tag.check_Optical()
-    print(tag.lux, ' lux')
+    #tag.enable_Optical(True)
+    #time.sleep(3)
+    #while True:
+    #    tag.check_Optical()
+    #    print(tag.lux, ' lux')
+    #    time.sleep(1)
 
+    tag.enable_9AxisSensor(True)
+    time.sleep(3)
+
+    state = False # True if gt 0.4 else Flase
+    count = 0
+    while True:
+        tag.check_9AxisSensor()
+        print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
+
+        if state == False and tag.acceleration["z"] > 0.0:
+            state = True
+            print('push to the server')
+            # push to server
+        else:
+            state = False
+
+        time.sleep(1)
 
     #tag.enable_humidity(True)
     #tag.check_humidity()

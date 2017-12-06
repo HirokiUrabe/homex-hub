@@ -159,9 +159,9 @@ if __name__ == '__main__':
             # push to server
             table.put_item(
                 Item={
-                    'eventName': 'pythonTest',
+                    'eventName': 'hue_control',
                     'date': datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f'),
-                    'data': {'power': False}
+                    'data': [{'power': False}]
                 }
             )
 

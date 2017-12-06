@@ -129,52 +129,46 @@ class DiscoverDevice():
 
 if __name__ == '__main__':
     dynamodb = boto3.resource('dynamodb', region_name='us-west-1')
-    date = datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f')
     table = dynamodb.Table('botMansion')
-    table.put_item(
-        Item={
-            'eventName': 'pythonTest',
-            'date': date,
-            'data': {'val': 10}
-            }
-        )
 
-    #if len(sys.argv) < 2:
-    #    print("Usage: {} <addr>".format(sys.argv[0]))
-    #    sys.exit(1)
-    #tag = SensorTag(sys.argv[1])
-    #tag.connect()
+    if len(sys.argv) < 2:
+        print("Usage: {} <addr>".format(sys.argv[0]))
+        sys.exit(1)
+    tag = SensorTag(sys.argv[1])
+    tag.connect()
+
     #tag.enable_Optical(True)
     #time.sleep(3)
     #while True:
     #    tag.check_Optical()
     #    print(tag.lux, ' lux')
     #    time.sleep(1)
+    #
 
     tag.enable_9AxisSensor(True)
     time.sleep(3)
+    state = False # True if gt 0.4 else Flase
+    count = 0
+    while True:
+        tag.check_9AxisSensor()
+        print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
+    
+        if state == False and tag.acceleration["z"] > 0.0:
+            state = True
+            print('push to the server')
+            # push to server
+            table.put_item(
+                Item={
+                    'eventName': 'pythonTest',
+                    'date': datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f'),
+                    'data': {'power': False}
+                }
+            )
 
-    #state = False # True if gt 0.4 else Flase
-    #count = 0
-    #while True:
-    #    tag.check_9AxisSensor()
-    #    print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
-    #
-    #    if state == False and tag.acceleration["z"] > 0.0:
-    #        state = True
-    #        print('push to the server')
-    #        # push to server
-    #    else:
-    #        state = False
-    #        dynamodb = boto3.resource('dynamodb')
-    #        date = datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f')
-    #        table = dynamodb.Table('botMansion')
-    #        table.put_item(
-    #
-    #
-    #    time.sleep(1)
-
-
+        else:
+            state = False
+    
+        time.sleep(1)
 
     #tag.enable_humidity(True)
     #tag.check_humidity()

@@ -10,6 +10,8 @@ import sys
 import ctypes
 import time
 import struct
+import boto3
+import datetime
 from gattlib import GATTRequester, DiscoveryService
 
 class SensorTag(object):
@@ -112,6 +114,13 @@ class SensorTag(object):
         raw_lux_e = (raw_lux & 0b1111000000000000) >> 12
         self.lux = raw_lux_m * (0.01 * pow(2.0,raw_lux_e))
 
+class Server():
+    def up(self, json):
+        service = DiscoveryService("hci0")
+        device = service.discover(2)
+        return device
+
+
 class DiscoverDevice():
     def GetDeviceList(self):
         service = DiscoveryService("hci0")
@@ -119,14 +128,22 @@ class DiscoverDevice():
         return device
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: {} <addr>".format(sys.argv[0]))
-        sys.exit(1)
+    dynamodb = boto3.resource('dynamodb', region_name='us-west-1')
+    date = datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f')
+    table = dynamodb.Table('botMansion')
+    table.put_item(
+        Item={
+            'eventName': 'pythonTest',
+            'date': date,
+            'data': {'val': 10}
+            }
+        )
 
-    tag = SensorTag(sys.argv[1])
-
-    tag.connect()
-
+    #if len(sys.argv) < 2:
+    #    print("Usage: {} <addr>".format(sys.argv[0]))
+    #    sys.exit(1)
+    #tag = SensorTag(sys.argv[1])
+    #tag.connect()
     #tag.enable_Optical(True)
     #time.sleep(3)
     #while True:
@@ -137,20 +154,27 @@ if __name__ == '__main__':
     tag.enable_9AxisSensor(True)
     time.sleep(3)
 
-    state = False # True if gt 0.4 else Flase
-    count = 0
-    while True:
-        tag.check_9AxisSensor()
-        print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
+    #state = False # True if gt 0.4 else Flase
+    #count = 0
+    #while True:
+    #    tag.check_9AxisSensor()
+    #    print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
+    #
+    #    if state == False and tag.acceleration["z"] > 0.0:
+    #        state = True
+    #        print('push to the server')
+    #        # push to server
+    #    else:
+    #        state = False
+    #        dynamodb = boto3.resource('dynamodb')
+    #        date = datetime.datetime.now().strftime('%Y%m%d%H%M%S.%f')
+    #        table = dynamodb.Table('botMansion')
+    #        table.put_item(
+    #
+    #
+    #    time.sleep(1)
 
-        if state == False and tag.acceleration["z"] > 0.0:
-            state = True
-            print('push to the server')
-            # push to server
-        else:
-            state = False
 
-        time.sleep(1)
 
     #tag.enable_humidity(True)
     #tag.check_humidity()

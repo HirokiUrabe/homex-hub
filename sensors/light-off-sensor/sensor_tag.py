@@ -137,17 +137,9 @@ if __name__ == '__main__':
     tag = SensorTag(sys.argv[1])
     tag.connect()
 
-    #tag.enable_Optical(True)
-    #time.sleep(3)
-    #while True:
-    #    tag.check_Optical()
-    #    print(tag.lux, ' lux')
-    #    time.sleep(1)
-    #
-
     tag.enable_9AxisSensor(True)
     time.sleep(3)
-    state = False # True if gt 0.4 else Flase
+    state = False
     count = 0
     while True:
         tag.check_9AxisSensor()
@@ -169,27 +161,5 @@ if __name__ == '__main__':
             state = False
     
         time.sleep(1)
-
-    #tag.enable_humidity(True)
-    #tag.check_humidity()
-    #print(tag.humidity,"% ", tag.temperature, "C")
-    #
-    #tag.enable_IRtemperature(True)
-    #tag.check_IRtemperature()
-    #print(tag.object_temperature,"C ", tag.temperature, "C")
-    #
-    #tag.enable_Barometer(True)
-    #tag.check_Barometer()
-    #print(tag.barometer,"hPa ", tag.temperature, "C")
-    #
-    #tag.enable_9AxisSensor(True)
-    #tag.check_9AxisSensor()
-    #print(tag.gyrometer["x"],"deg/sec ",tag.gyrometer["y"],"deg/sec ",tag.gyrometer["z"],"deg/sec")
-    #print(tag.acceleration["x"],"G ",tag.acceleration["y"],"G ",tag.acceleration["z"],"G")
-    #print(tag.geomagnetism["x"],"uT ",tag.geomagnetism["y"],"uT ",tag.geomagnetism["z"],"uT")
-    #
-    #tag.enable_Optical(True)
-    #tag.check_Optical()
-    #print(tag.lux,"lx")
 
     tag.disconnect()
